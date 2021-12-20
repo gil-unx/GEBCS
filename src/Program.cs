@@ -37,6 +37,7 @@ namespace GEBCS
         }
         static void Repack()
         {
+            long pointOffset = 0x50500000;
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(ResNames));
             Stream reader = new FileStream("Resnames.xml", FileMode.Open, FileAccess.Read);
             ResNames resNames = (ResNames)xmlSerializer.Deserialize(reader);
@@ -46,7 +47,7 @@ namespace GEBCS
             for(int i = resNames.Names.Count-1; i >= 0; i--)
             {
                 PresRepack pres = new PresRepack(resNames.Names[i]);
-                pres.Repack(ref package);
+                pres.Repack(ref package, ref pointOffset);
 
             }
             package.Close();

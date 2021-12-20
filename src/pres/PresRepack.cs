@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
-using System.IO.Compression;
+//using System.IO.Compression;
 using System.Text;
 using GIL.FUNCTION;
+using Ionic.Zlib;
 namespace GEBCS
 {
     class PresRepack
@@ -14,6 +15,7 @@ namespace GEBCS
         private MemoryStream resStream;     
         public PresRepack(string resName)
         {
+           
             XmlSerializer presSerial = new XmlSerializer(typeof(Pres));
             Stream xmlReader = new FileStream(Path.ChangeExtension(resName,"xml"), FileMode.Open, FileAccess.Read);
             pres = (Pres)presSerial.Deserialize(xmlReader);
@@ -29,7 +31,7 @@ namespace GEBCS
                 writer.Write(i);
             }
         }
-        public void Repack(ref BW package)
+        public void Repack(ref BW package,ref long pointOffset)
         {
             MemoryStream memory = new MemoryStream();
             BW newFiles = new BW(memory);
@@ -74,7 +76,8 @@ namespace GEBCS
                     byte[] compBuffer;
                     if (file.Compression == true)
                     {
-                        compBuffer = Compress(buffer);
+                        CompressionLevel level = CompressionLevel.Default;
+                        compBuffer = Compress(buffer,level);
                     }
                     else
                     {
@@ -83,12 +86,36 @@ namespace GEBCS
                     file.Size = compBuffer.Length;
                     if(file.Size > file.MaxSize)
                     {
-                        Console.WriteLine("Max size reached!!\nFile :\n{0}\nmaxsize :{1, 0:X8}\nnew size :{2, 0:X8}", outFolder + file.FileName,file.MaxSize,file.Size);
-                        Environment.Exit(0);
+                        Console.WriteLine("Max size reached!!\nFile :\n{0}\nmaxsize :{1, 0:X8}\nnew size :{2, 0:X8}\nTry Compress Maximum", outFolder + file.FileName,file.MaxSize,file.Size);
+                        Console.ReadKey();
+                        CompressionLevel level = CompressionLevel.BestCompression;
+                        compBuffer = Compress(buffer,level);
+                        file.Size = compBuffer.Length;
+                       
+
                     }
-                    package.BaseStream.Seek(file.Offset << file.ShiftOffset, SeekOrigin.Begin);
-                    package.Write(compBuffer);
-                    package.WritePadding(0X8000, 0);
+                    if (file.Size > file.MaxSize)
+                    {
+                        Console.WriteLine("Compression File larger than maximum size,\nExperimental Pointing mode?\nY\\N");
+                        string pil = Console.ReadLine().ToUpper();
+                        if (pil != "Y") Environment.Exit(0);
+                       
+                        package.BaseStream.Seek(pointOffset, SeekOrigin.Begin);
+                        file.Offset = (int)pointOffset >> file.ShiftOffset;
+                        package.Write(compBuffer);
+                        package.WritePadding(0X8000, 0);
+                        pointOffset = package.BaseStream.Position;
+
+
+                    }
+                    else
+                    {
+                        package.BaseStream.Seek(file.Offset << file.ShiftOffset, SeekOrigin.Begin);
+                        package.Write(compBuffer);
+                        package.WritePadding(0X8000, 0);
+
+                    }
+                   
                     file.OffsetName = (int)newFiles.BaseStream.Position + pres.TocSize;
                     MemoryStream arrName = new MemoryStream();
                     int baseName = (int)newFiles.BaseStream.Position + pres.TocSize + (file.ChunkName * 4);
@@ -111,11 +138,11 @@ namespace GEBCS
             writer.Flush();
             CalcCecksum(pres.Filename);
         }
-        private byte[] Compress(byte[] raw)
+        private byte[] Compress(byte[] raw, CompressionLevel level)
         {
             using (MemoryStream memory = new MemoryStream())
             {
-                using (GZipStream gzip = new GZipStream(memory, CompressionLevel.Optimal,true))
+                using (GZipStream gzip = new GZipStream(memory,CompressionMode.Compress,level))
                 {      
                     gzip.Write(raw, 0, raw.Length);
                 }
