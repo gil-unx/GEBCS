@@ -87,7 +87,6 @@ namespace GEBCS
                     if(file.Size > file.MaxSize)
                     {
                         Console.WriteLine("Max size reached!!\nFile :\n{0}\nmaxsize :{1, 0:X8}\nnew size :{2, 0:X8}\nTry Compress Maximum", outFolder + file.FileName,file.MaxSize,file.Size);
-                        Console.ReadKey();
                         CompressionLevel level = CompressionLevel.BestCompression;
                         compBuffer = Compress(buffer,level);
                         file.Size = compBuffer.Length;
