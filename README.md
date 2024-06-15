@@ -1,8 +1,20 @@
+# Ganti ke NET 8.0
+
+
 # Buat unpack dan repack package.rdp di game god eater burst psp
 
 
 # Tutor:
 https://youtu.be/10mNl7aa-6Q
+
+# PACKAGE Extract/Insert:
+Simpan GEBCS.exe di folder \PSP\GAME\[NPJH50352|ULES01519|ULUS10563]
+
+eksekusi
+
+GEBCS.exe -x
+
+GEBCS.exe -c
 
 # DLC Extract/Insert:
 Simpan GEBCS.exe di folder \PSP\GAME\[NPJH50352|ULES01519|ULUS10563]

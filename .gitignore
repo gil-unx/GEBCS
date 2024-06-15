@@ -1,8 +1,10 @@
 
 *.iso
-package.rdp
+*.rdp
+system/*
 src/bin/*
 /src/.vs
 *.xml
-/src/obj
+/src/GEBCS/obj
+/src/GEBCS/bin
 system.res
