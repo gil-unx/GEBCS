@@ -7,6 +7,8 @@
 # Tutor:
 https://youtu.be/10mNl7aa-6Q
 
+dlc Extract/Insert
+https://www.youtube.com/watch?v=zi930SimbKc
 # PACKAGE Extract/Insert:
 Simpan GEBCS.exe di folder \PSP\GAME\[NPJH50352|ULES01519|ULUS10563]
 
