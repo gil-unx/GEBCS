@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <StartArguments>-cdlc f3594808fb6a0f2123811d0d26b0af74.EDAT 4a92f06c65fd9bc1536e36e89a065222.EDAT</StartArguments>
+  </PropertyGroup>
+</Project>

@@ -1,17 +1,8 @@
 
-src/bin/Release/GEBCS.pdb
-src/bin/Release/GEBCS.exe.config
-src/.vs/GEBCS/v16/.suo
-src/bin/Release/GEBCS.exe
-src/bin/Release/Ionic.Zlib.CF.dll
-src/obj/Release/GEBCS.csproj.FileListAbsolute.txt
-src/obj/Release/GEBCS.csprojAssemblyReference.cache
-src/obj/Release/GEBCS.exe
-src/obj/Release/GEBCS.pdb
-src/obj/Debug/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs
-src/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
-src/obj/Debug/GEBCS.csprojAssemblyReference.cache
-src/obj/Release/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs
-src/obj/Release/DesignTimeResolveAssemblyReferencesInput.cache
-src/obj/Release/GEBCS.csproj.CopyComplete
-src/obj/Release/GEBCS.csproj.CoreCompileInputs.cache
+*.iso
+package.rdp
+src/bin/*
+/src/.vs
+*.xml
+/src/obj
+system.res

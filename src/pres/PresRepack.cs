@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using System.Text;
 using GIL.FUNCTION;
 using Ionic.Zlib;
+using System.Collections.Generic;
 namespace GEBCS
 {
     class PresRepack
@@ -12,11 +13,13 @@ namespace GEBCS
         private Pres pres = new Pres();
         private BW writer;
         private string outFolder;
-        private MemoryStream resStream;     
-        public PresRepack(string resName)
+        private MemoryStream resStream;
+        private bool isDlc = false;
+        Dictionary<UInt64, int> ptSame = new Dictionary<UInt64, int>();
+        public PresRepack(string resName,bool dlc =false)
         {
-           
-            XmlSerializer presSerial = new XmlSerializer(typeof(Pres));
+            isDlc = dlc;
+             XmlSerializer presSerial = new XmlSerializer(typeof(Pres));
             Stream xmlReader = new FileStream(Path.ChangeExtension(resName,"xml"), FileMode.Open, FileAccess.Read);
             pres = (Pres)presSerial.Deserialize(xmlReader);
             outFolder = Path.GetDirectoryName(resName) + "\\" + Path.GetFileNameWithoutExtension(resName) + "\\";
@@ -74,47 +77,96 @@ namespace GEBCS
                 {
                     byte[] buffer = File.ReadAllBytes(outFolder + file.FileName);
                     byte[] compBuffer;
-                    if (file.Compression == true)
+                    if (isDlc)
                     {
-                        CompressionLevel level = CompressionLevel.Default;
-                        compBuffer = Compress(buffer,level);
-                    }
-                    else
-                    {
-                        compBuffer = buffer;
-                    }
-                    file.Size = compBuffer.Length;
-                    if(file.Size > file.MaxSize)
-                    {
-                        Console.WriteLine("Max size reached!!\nFile :\n{0}\nmaxsize :{1, 0:X8}\nnew size :{2, 0:X8}\nTry Compress Maximum", outFolder + file.FileName,file.MaxSize,file.Size);
-                        CompressionLevel level = CompressionLevel.BestCompression;
-                        compBuffer = Compress(buffer,level);
+                        UInt64 cekSumU = CalcCecksumU(buffer);
+                        if (file.Compression == true)
+                        {
+                            CompressionLevel level = CompressionLevel.Default;
+                            compBuffer = Compress(buffer, level);
+                        }
+                        else
+                        {
+                            compBuffer = buffer;
+                        }
                         file.Size = compBuffer.Length;
-                       
+                        if (file.Size > file.MaxSize)
+                        {
+                            Console.WriteLine("Max size reached!!\nFile :\n{0}\nmaxsize :{1, 0:X8}\nnew size :{2, 0:X8}\nTry Compress Maximum", outFolder + file.FileName, file.MaxSize, file.Size);
+                            CompressionLevel level = CompressionLevel.BestCompression;
+                            compBuffer = Compress(buffer, level);
+                            file.Size = compBuffer.Length;
 
-                    }
-                    if (file.Size > file.MaxSize)
-                    {
-                        Console.WriteLine("Compression File larger than maximum size,\nExperimental Pointing mode?\nY\\N");
-                        string pil = Console.ReadLine().ToUpper();
-                        if (pil != "Y") Environment.Exit(0);
+
+                        }
+
+                        int newOffset;
+
                        
-                        package.BaseStream.Seek(pointOffset, SeekOrigin.Begin);
-                        file.Offset = (int)pointOffset >> file.ShiftOffset;
-                        package.Write(compBuffer);
-                        package.WritePadding(0X8000, 0);
-                        pointOffset = package.BaseStream.Position;
+                        if (ptSame.TryGetValue(cekSumU, out newOffset))
+                        {
+                        }
+                        else
+                        {
+                            newOffset = (int)pointOffset >> file.ShiftOffset;
+                            ptSame.Add(cekSumU, newOffset);
+                            file.Offset = newOffset;
+                            package.Write(compBuffer);
+                            package.WritePadding(0X10, 0);
+                            pointOffset = package.BaseStream.Position;
+
+
+
+                        }
+
 
 
                     }
                     else
                     {
-                        package.BaseStream.Seek(file.Offset << file.ShiftOffset, SeekOrigin.Begin);
-                        package.Write(compBuffer);
-                        package.WritePadding(0X8000, 0);
+                        if (file.Compression == true)
+                        {
+                            CompressionLevel level = CompressionLevel.Default;
+                            compBuffer = Compress(buffer, level);
+                        }
+                        else
+                        {
+                            compBuffer = buffer;
+                        }
+                        file.Size = compBuffer.Length;
+                        if (file.Size > file.MaxSize)
+                        {
+                            Console.WriteLine("Max size reached!!\nFile :\n{0}\nmaxsize :{1, 0:X8}\nnew size :{2, 0:X8}\nTry Compress Maximum", outFolder + file.FileName, file.MaxSize, file.Size);
+                            CompressionLevel level = CompressionLevel.BestCompression;
+                            compBuffer = Compress(buffer, level);
+                            file.Size = compBuffer.Length;
+
+
+                        }
+                        if (file.Size > file.MaxSize)
+                        {
+                            Console.WriteLine("Compression File larger than maximum size,\nExperimental Pointing mode?\nY\\N");
+                            string pil = Console.ReadLine().ToUpper();
+                            if (pil != "Y") Environment.Exit(0);
+
+                            package.BaseStream.Seek(pointOffset, SeekOrigin.Begin);
+                            file.Offset = (int)pointOffset >> file.ShiftOffset;
+                            package.Write(compBuffer);
+                            package.WritePadding(0X8000, 0);
+                            pointOffset = package.BaseStream.Position;
+
+
+                        }
+                        else
+                        {
+                            package.BaseStream.Seek(file.Offset << file.ShiftOffset, SeekOrigin.Begin);
+                            package.Write(compBuffer);
+                            package.WritePadding(0X8000, 0);
+
+                        }
 
                     }
-                   
+
                     file.OffsetName = (int)newFiles.BaseStream.Position + pres.TocSize;
                     MemoryStream arrName = new MemoryStream();
                     int baseName = (int)newFiles.BaseStream.Position + pres.TocSize + (file.ChunkName * 4);
@@ -147,6 +199,18 @@ namespace GEBCS
                 }
                 return memory.ToArray();
             }
+        }
+        private UInt64 CalcCecksumU(byte[] destAarray)
+        {
+          
+            uint t = 0;
+            uint cecksum = 0;
+            foreach (byte b in destAarray)
+            {
+                cecksum = b ^ t;
+                t = b + cecksum;
+            }
+            return cecksum;
         }
         private void CalcCecksum(string destName)
         {

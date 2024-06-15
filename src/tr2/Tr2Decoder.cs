@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using GIL.FUNCTION;
 using System.Text;
+using System.Text.Json;
+using GEBCS.tr2;
 
 namespace GEBCS
 {
@@ -113,9 +115,59 @@ namespace GEBCS
                             Utf8(ref tr2Info, ref memoryReader);
                         }
                         break;
-              
 
 
+                    case "INT8":
+
+                        
+                        Int8(ref tr2Info, ref memoryReader);
+                        
+                        
+                        break;
+                    case "INT16":
+
+
+                        Int16(ref tr2Info, ref memoryReader);
+
+
+                        break;
+
+                    case "INT32":
+
+
+                        Int32(ref tr2Info, ref memoryReader);
+
+
+                        break;
+                    case "UINT8":
+
+
+                        UInt8(ref tr2Info, ref memoryReader);
+
+
+                        break;
+                    case "UINT16":
+
+
+                        UInt16(ref tr2Info, ref memoryReader);
+
+
+                        break;
+
+                    case "UINT32":
+
+
+                        UInt32(ref tr2Info, ref memoryReader);
+
+
+                        break;
+                    case "FLOAT32":
+
+
+                        Float32(ref tr2Info, ref memoryReader);
+
+
+                        break;
                     default:
                         tr2Info.ArrFile = Convert.ToBase64String(memoryStream.ToArray());
                         break;
@@ -178,7 +230,204 @@ namespace GEBCS
         }
 
 
-      
+        private void Int8(ref Tr2Info tr2Info, ref BR rdr)
+        {
+
+            INT8 int8 = new INT8();
+            int8.EncodingType = "INT8";
+            int8.Data = new List<List<sbyte>>();
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                
+                int off = rdr.ReadInt32();
+                int end = rdr.ReadInt32();
+                int len = end - off;
+                rdr.BaseStream.Seek(-4, SeekOrigin.Current);
+                long tmp = rdr.BaseStream.Position;
+                rdr.BaseStream.Seek(off, SeekOrigin.Begin);
+                List<sbyte> s = new List<sbyte>();
+                for (int j = 0; j < len; j++)
+                {
+                    s.Add(rdr.ReadSByte());
+                }
+                int8.Data.Add(s);
+                rdr.BaseStream.Seek(tmp, SeekOrigin.Begin);
+
+
+            }
+            CreateJson(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json", int8);
+
+        }
+        private void Int16(ref Tr2Info tr2Info, ref BR rdr)
+        {
+
+            INT16 int16 = new INT16();
+            int16.EncodingType = "INT16";
+            int16.Data = new List<List<short>>();
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+
+                int off = rdr.ReadInt32();
+                int end = rdr.ReadInt32();
+                int len = (end - off)/2;
+                rdr.BaseStream.Seek(-4, SeekOrigin.Current);
+                long tmp = rdr.BaseStream.Position;
+                rdr.BaseStream.Seek(off, SeekOrigin.Begin);
+                List<short> s = new List<short>();
+                for (int j = 0; j < len; j++)
+                {
+                    s.Add(rdr.ReadInt16());
+                }
+                int16.Data.Add(s);
+                rdr.BaseStream.Seek(tmp, SeekOrigin.Begin);
+
+
+            }
+            CreateJson(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json", int16);
+
+        }
+        private void Int32(ref Tr2Info tr2Info, ref BR rdr)
+        {
+
+            INT32 int32 = new INT32();
+            int32.EncodingType = "INT32";
+            int32.Data = new List<List<int>>();
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+
+                int off = rdr.ReadInt32();
+                int end = rdr.ReadInt32();
+                int len = (end - off) / 4;
+                rdr.BaseStream.Seek(-4, SeekOrigin.Current);
+                long tmp = rdr.BaseStream.Position;
+                rdr.BaseStream.Seek(off, SeekOrigin.Begin);
+                List<int> s = new List<int>();
+                for (int j = 0; j < len; j++)
+                {
+                    s.Add(rdr.ReadInt32());
+                }
+                int32.Data.Add(s);
+                rdr.BaseStream.Seek(tmp, SeekOrigin.Begin);
+
+
+            }
+            CreateJson(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json", int32);
+
+        }
+        private void UInt8(ref Tr2Info tr2Info, ref BR rdr)
+        {
+
+            UINT8 uint8 = new UINT8();
+            uint8.EncodingType = "UINT8";
+            uint8.Data = new List<List<byte>>();
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+
+                int off = rdr.ReadInt32();
+                int end = rdr.ReadInt32();
+                int len = end - off;
+                rdr.BaseStream.Seek(-4, SeekOrigin.Current);
+                long tmp = rdr.BaseStream.Position;
+                rdr.BaseStream.Seek(off, SeekOrigin.Begin);
+                List<byte> s = new List<byte>();
+                for (int j = 0; j < len; j++)
+                {
+                    s.Add(rdr.ReadByte());
+                }
+                uint8.Data.Add(s);
+                rdr.BaseStream.Seek(tmp, SeekOrigin.Begin);
+
+
+            }
+            CreateJson(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json", uint8);
+
+        }
+        private void UInt16(ref Tr2Info tr2Info, ref BR rdr)
+        {
+
+            UINT16 uint16 = new UINT16();
+            uint16.EncodingType = "UINT16";
+            uint16.Data = new List<List<ushort>>();
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+
+                int off = rdr.ReadInt32();
+                int end = rdr.ReadInt32();
+                int len = (end - off) / 2;
+                rdr.BaseStream.Seek(-4, SeekOrigin.Current);
+                long tmp = rdr.BaseStream.Position;
+                rdr.BaseStream.Seek(off, SeekOrigin.Begin);
+                List<ushort> s = new List<ushort>();
+                for (int j = 0; j < len; j++)
+                {
+                    s.Add(rdr.ReadUInt16());
+                }
+                uint16.Data.Add(s);
+                rdr.BaseStream.Seek(tmp, SeekOrigin.Begin);
+
+
+            }
+            CreateJson(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json", uint16);
+
+        }
+        private void UInt32(ref Tr2Info tr2Info, ref BR rdr)
+        {
+
+            UINT32 uint32 = new UINT32();
+            uint32.EncodingType = "UINT32";
+            uint32.Data = new List<List<uint>>();
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+
+                int off = rdr.ReadInt32();
+                int end = rdr.ReadInt32();
+                int len = (end - off) / 4;
+                rdr.BaseStream.Seek(-4, SeekOrigin.Current);
+                long tmp = rdr.BaseStream.Position;
+                rdr.BaseStream.Seek(off, SeekOrigin.Begin);
+                List<uint> s = new List<uint>();
+                for (int j = 0; j < len; j++)
+                {
+                    s.Add(rdr.ReadUInt32());
+                }
+                uint32.Data.Add(s);
+                rdr.BaseStream.Seek(tmp, SeekOrigin.Begin);
+
+
+            }
+            CreateJson(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json", uint32);
+
+        }
+        private void Float32(ref Tr2Info tr2Info, ref BR rdr)
+        {
+
+            FLOAT32 float32 = new FLOAT32();
+            float32.EncodingType = "FLOAT32";
+            float32.Data = new List<List<Single>>();
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+
+                int off = rdr.ReadInt32();
+                int end = rdr.ReadInt32();
+                int len = (end - off) / 4;
+                rdr.BaseStream.Seek(-4, SeekOrigin.Current);
+                long tmp = rdr.BaseStream.Position;
+                rdr.BaseStream.Seek(off, SeekOrigin.Begin);
+                List<Single> s = new List<Single>();
+                for (int j = 0; j < len; j++)
+                {
+                    s.Add(rdr.ReadSingle());
+                }
+                float32.Data.Add(s);
+                rdr.BaseStream.Seek(tmp, SeekOrigin.Begin);
+
+
+            }
+            CreateJson(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json", float32);
+
+        }
+
+
         private void CreateXml()
         {
             XmlSerializer xmlSerializer = new XmlSerializer(typeof(Tr2));
@@ -203,6 +452,68 @@ namespace GEBCS
 
 
         }
+        private void CreateJson(string fileName, INT8 encodingType)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            string jsonString = JsonSerializer.Serialize(encodingType, new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            File.WriteAllText(fileName, jsonString);
 
+
+
+        }
+        private void CreateJson(string fileName, UINT8 encodingType)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            string jsonString = JsonSerializer.Serialize(encodingType, new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            File.WriteAllText(fileName, jsonString);
+
+
+
+        }
+        private void CreateJson(string fileName, INT16 encodingType)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            string jsonString = JsonSerializer.Serialize(encodingType, new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            File.WriteAllText(fileName, jsonString);
+
+
+
+        }
+        private void CreateJson(string fileName, UINT16 encodingType)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            string jsonString = JsonSerializer.Serialize(encodingType, new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            File.WriteAllText(fileName, jsonString);
+
+
+
+        }
+        private void CreateJson(string fileName, INT32 encodingType)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            string jsonString = JsonSerializer.Serialize(encodingType, new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            File.WriteAllText(fileName, jsonString);
+
+
+
+        }
+        private void CreateJson(string fileName, UINT32 encodingType)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            string jsonString = JsonSerializer.Serialize(encodingType, new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            File.WriteAllText(fileName, jsonString);
+
+
+
+        }
+        private void CreateJson(string fileName, FLOAT32 encodingType)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            string jsonString = JsonSerializer.Serialize(encodingType, new JsonSerializerOptions() { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            File.WriteAllText(fileName, jsonString);
+
+
+
+        }
     }
 }

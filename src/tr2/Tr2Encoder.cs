@@ -1,10 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using GEBCS.tr2;
 using GIL.FUNCTION;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
-
+using System.Text.Json;
+using System.Xml.Serialization;
 namespace GEBCS
 {
     class Tr2Encoder
@@ -70,6 +71,27 @@ namespace GEBCS
                         break;
 
 
+                    case "INT8":
+                        buffer = Int8(tr2Info);
+                        break;
+                    case "INT16":
+                        buffer = Int16(tr2Info);
+                        break;
+                    case "INT32":
+                        buffer = Int32(tr2Info);
+                        break;
+                    case "UINT8":
+                        buffer = UInt8(tr2Info);
+                        break;
+                    case "UINT16":
+                        buffer = UInt16(tr2Info);
+                        break;
+                    case "UINT32":
+                        buffer = UInt32(tr2Info);
+                        break;
+                    case "FLOAT32":
+                        buffer = Float32(tr2Info);
+                        break;
 
                     default:
                        
@@ -142,6 +164,295 @@ namespace GEBCS
             mw.WritePadding(16, 0);
             return ms.ToArray();
         }
+        private byte[] Int8(Tr2Info tr2Info)
+        {
+            INT8 int8 = JsonSerializer.Deserialize<INT8>(File.ReadAllText(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json"));
+
+
+               
+            MemoryStream ms = new MemoryStream();
+            BW mw = new BW(ms);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.Name));
+            mw.BaseStream.Seek(0x30, SeekOrigin.Begin);
+            mw.Write(tr2Info.Dir);
+            mw.Write(0);
+            mw.Write(tr2Info.PointerType);
+            mw.Write(tr2Info.Unk1);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.EncodingType));
+            mw.BaseStream.Seek(0x74, SeekOrigin.Begin);
+            mw.Write(tr2Info.Unk2);
+            mw.Write(tr2Info.Unk3);
+            mw.Write(tr2Info.Count);
+            int newOff = (tr2Info.Count * 4) + 0x88;
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                mw.Write(newOff);
+                int newLen = int8.Data[i].Count;
+                newOff += newLen;
+                
+            }
+            mw.Write(newOff);
+            mw.BaseStream.Seek((long)(tr2Info.Count * 4) + 0x88, SeekOrigin.Begin);
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                foreach (var b in int8.Data[i])
+                {
+                    mw.Write(b);
+                }
+               
+               
+            }
+            mw.WritePadding(16, 0);
+            return ms.ToArray();
+        }
+        private byte[] Int16(Tr2Info tr2Info)
+        {
+            INT16 int16 = JsonSerializer.Deserialize<INT16>(File.ReadAllText(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json"));
+
+
+
+            MemoryStream ms = new MemoryStream();
+            BW mw = new BW(ms);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.Name));
+            mw.BaseStream.Seek(0x30, SeekOrigin.Begin);
+            mw.Write(tr2Info.Dir);
+            mw.Write(0);
+            mw.Write(tr2Info.PointerType);
+            mw.Write(tr2Info.Unk1);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.EncodingType));
+            mw.BaseStream.Seek(0x74, SeekOrigin.Begin);
+            mw.Write(tr2Info.Unk2);
+            mw.Write(tr2Info.Unk3);
+            mw.Write(tr2Info.Count);
+            int newOff = (tr2Info.Count * 4) + 0x88;
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                mw.Write(newOff);
+                int newLen = int16.Data[i].Count*2;
+                newOff += newLen;
+
+            }
+            mw.Write(newOff);
+            mw.BaseStream.Seek((long)(tr2Info.Count * 4) + 0x88, SeekOrigin.Begin);
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                foreach (var b in int16.Data[i])
+                {
+                    mw.Write(b);
+                }
+
+
+            }
+            mw.WritePadding(16, 0);
+            return ms.ToArray();
+        }
+        private byte[] Int32(Tr2Info tr2Info)
+        {
+            INT32 int32 = JsonSerializer.Deserialize<INT32>(File.ReadAllText(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json"));
+
+
+
+            MemoryStream ms = new MemoryStream();
+            BW mw = new BW(ms);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.Name));
+            mw.BaseStream.Seek(0x30, SeekOrigin.Begin);
+            mw.Write(tr2Info.Dir);
+            mw.Write(0);
+            mw.Write(tr2Info.PointerType);
+            mw.Write(tr2Info.Unk1);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.EncodingType));
+            mw.BaseStream.Seek(0x74, SeekOrigin.Begin);
+            mw.Write(tr2Info.Unk2);
+            mw.Write(tr2Info.Unk3);
+            mw.Write(tr2Info.Count);
+            int newOff = (tr2Info.Count * 4) + 0x88;
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                mw.Write(newOff);
+                int newLen = int32.Data[i].Count*4;
+                newOff += newLen;
+
+            }
+            mw.Write(newOff);
+            mw.BaseStream.Seek((long)(tr2Info.Count * 4) + 0x88, SeekOrigin.Begin);
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                foreach (var b in int32.Data[i])
+                {
+                    mw.Write(b);
+                }
+
+
+            }
+            mw.WritePadding(16, 0);
+            return ms.ToArray();
+        }
+        private byte[] UInt8(Tr2Info tr2Info)
+        {
+            UINT8 uint8 = JsonSerializer.Deserialize<UINT8>(File.ReadAllText(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json"));
+
+
+
+            MemoryStream ms = new MemoryStream();
+            BW mw = new BW(ms);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.Name));
+            mw.BaseStream.Seek(0x30, SeekOrigin.Begin);
+            mw.Write(tr2Info.Dir);
+            mw.Write(0);
+            mw.Write(tr2Info.PointerType);
+            mw.Write(tr2Info.Unk1);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.EncodingType));
+            mw.BaseStream.Seek(0x74, SeekOrigin.Begin);
+            mw.Write(tr2Info.Unk2);
+            mw.Write(tr2Info.Unk3);
+            mw.Write(tr2Info.Count);
+            int newOff = (tr2Info.Count * 4) + 0x88;
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                mw.Write(newOff);
+                int newLen = uint8.Data[i].Count;
+                newOff += newLen;
+
+            }
+            mw.Write(newOff);
+            mw.BaseStream.Seek((long)(tr2Info.Count * 4) + 0x88, SeekOrigin.Begin);
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                foreach (var b in uint8.Data[i])
+                {
+                    mw.Write(b);
+                }
+
+
+            }
+            mw.WritePadding(16, 0);
+            return ms.ToArray();
+        }
+        private byte[] UInt16(Tr2Info tr2Info)
+        {
+            UINT16 uint16 = JsonSerializer.Deserialize<UINT16>(File.ReadAllText(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json"));
+
+
+
+            MemoryStream ms = new MemoryStream();
+            BW mw = new BW(ms);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.Name));
+            mw.BaseStream.Seek(0x30, SeekOrigin.Begin);
+            mw.Write(tr2Info.Dir);
+            mw.Write(0);
+            mw.Write(tr2Info.PointerType);
+            mw.Write(tr2Info.Unk1);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.EncodingType));
+            mw.BaseStream.Seek(0x74, SeekOrigin.Begin);
+            mw.Write(tr2Info.Unk2);
+            mw.Write(tr2Info.Unk3);
+            mw.Write(tr2Info.Count);
+            int newOff = (tr2Info.Count * 4) + 0x88;
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                mw.Write(newOff);
+                int newLen = uint16.Data[i].Count * 2;
+                newOff += newLen;
+
+            }
+            mw.Write(newOff);
+            mw.BaseStream.Seek((long)(tr2Info.Count * 4) + 0x88, SeekOrigin.Begin);
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                foreach (var b in uint16.Data[i])
+                {
+                    mw.Write(b);
+                }
+
+
+            }
+            mw.WritePadding(16, 0);
+            return ms.ToArray();
+        }
+        private byte[] UInt32(Tr2Info tr2Info)
+        {
+            UINT32 uint32 = JsonSerializer.Deserialize<UINT32>(File.ReadAllText(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json"));
+
+
+
+            MemoryStream ms = new MemoryStream();
+            BW mw = new BW(ms);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.Name));
+            mw.BaseStream.Seek(0x30, SeekOrigin.Begin);
+            mw.Write(tr2Info.Dir);
+            mw.Write(0);
+            mw.Write(tr2Info.PointerType);
+            mw.Write(tr2Info.Unk1);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.EncodingType));
+            mw.BaseStream.Seek(0x74, SeekOrigin.Begin);
+            mw.Write(tr2Info.Unk2);
+            mw.Write(tr2Info.Unk3);
+            mw.Write(tr2Info.Count);
+            int newOff = (tr2Info.Count * 4) + 0x88;
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                mw.Write(newOff);
+                int newLen = uint32.Data[i].Count * 4;
+                newOff += newLen;
+
+            }
+            mw.Write(newOff);
+            mw.BaseStream.Seek((long)(tr2Info.Count * 4) + 0x88, SeekOrigin.Begin);
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                foreach (var b in uint32.Data[i])
+                {
+                    mw.Write(b);
+                }
+
+
+            }
+            mw.WritePadding(16, 0);
+            return ms.ToArray();
+        }
+        private byte[] Float32(Tr2Info tr2Info)
+        {
+            FLOAT32 float32 = JsonSerializer.Deserialize<FLOAT32>(File.ReadAllText(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".json"));
+
+
+
+            MemoryStream ms = new MemoryStream();
+            BW mw = new BW(ms);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.Name));
+            mw.BaseStream.Seek(0x30, SeekOrigin.Begin);
+            mw.Write(tr2Info.Dir);
+            mw.Write(0);
+            mw.Write(tr2Info.PointerType);
+            mw.Write(tr2Info.Unk1);
+            mw.Write(Encoding.UTF8.GetBytes(tr2Info.EncodingType));
+            mw.BaseStream.Seek(0x74, SeekOrigin.Begin);
+            mw.Write(tr2Info.Unk2);
+            mw.Write(tr2Info.Unk3);
+            mw.Write(tr2Info.Count);
+            int newOff = (tr2Info.Count * 4) + 0x88;
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                mw.Write(newOff);
+                int newLen = float32.Data[i].Count * 4;
+                newOff += newLen;
+
+            }
+            mw.Write(newOff);
+            mw.BaseStream.Seek((long)(tr2Info.Count * 4) + 0x88, SeekOrigin.Begin);
+            for (int i = 0; i < tr2Info.Count; i++)
+            {
+                foreach (var b in float32.Data[i])
+                {
+                    mw.Write(b);
+                }
+
+
+            }
+            mw.WritePadding(16, 0);
+            return ms.ToArray();
+        }
+
+
         private byte[] Utf8Yobi(Tr2Info tr2Info)
         {
             List<string> newStrings = LoadTxt(tr2.FileName.Replace(".tr2", "\\") + tr2Info.Name + ".txt", tr2Info.Count);
@@ -160,7 +471,7 @@ namespace GEBCS
             mw.Write(tr2Info.Count);
             int newOff = (tr2Info.Count * 12) + 0x80;
             for (int i = 0; i < tr2Info.Count; i++)
-             {
+            {
                 mw.Write(tr2Info.IndexString[i]);
                 mw.Write(newOff);
                 int newLen = (int)Encoding.UTF8.GetBytes(newStrings[i]).Length;

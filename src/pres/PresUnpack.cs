@@ -16,8 +16,10 @@ namespace GEBCS
         private Dictionary<string, int> duplicateCek = new Dictionary<string, int>();
         private string duplicate = "";
         private FileStream fileStream;
-        public PresUnpack(string fileName)
+        private bool isDlc = false;
+        public PresUnpack(string fileName,bool dlc = false)
         {
+            isDlc = dlc;
             fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);   
             outFolder = Path.GetDirectoryName(fileName)+"\\" + Path.GetFileNameWithoutExtension(fileName) + "\\";
             reader = new BR(fileStream);
@@ -129,6 +131,10 @@ namespace GEBCS
                             {
                                 file.Location = "Package";
                                 file.ShiftOffset = 15;
+                                if (isDlc)
+                                {
+                                    file.ShiftOffset = 4;
+                                }
                             }                          
                         }
                     }
