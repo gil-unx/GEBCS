@@ -177,7 +177,8 @@ namespace GEBCS
                     }
                     if(comBuffer.Length > 0)
                     {
-                        if ((comBuffer[0] == 0x1f) && (comBuffer[1] == 0x8b) && (comBuffer[2] == 0x08) && (comBuffer[4] == 0x00))
+                        
+                        if ((comBuffer[0] == 0x1f) && (comBuffer[1] == 0x8b) && (comBuffer[2] == 0x08) && (comBuffer[3] == 0x00))
                         {
                             file.Compression = true;
                             byte[] decBuffer = Decompress(comBuffer);

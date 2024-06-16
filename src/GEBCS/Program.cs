@@ -104,8 +104,7 @@ namespace GEBCS
         }
         static void Main(string[] args)
         {
-           // Tr2Encoder t = new Tr2Encoder("C:\\Users\\ThinkPad\\Documents\\GitHub\\GEBCS\\system\\god_menu\\god_m001_Title\\muji\\article.tr2");
-           
+           // Unpack();
             string mode = "";
             Console.WriteLine("God Eater Burst package unpacker");
             Console.WriteLine("================================");
