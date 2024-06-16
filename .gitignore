@@ -8,3 +8,5 @@ src/bin/*
 /src/GEBCS/obj
 /src/GEBCS/bin
 system.res
+system.json
+Tr2names.json

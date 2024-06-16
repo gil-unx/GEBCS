@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "GECV_EX_PRES": {
+      "commandName": "Project",
+      "commandLineArgs": "pack .\\unpack_pres .\\pack_pres",
+      "workingDirectory": "H:\\SteamLibrary\\steamapps\\common\\GOD EATER 2 Rage Burst\\bin"
+    }
+  }
+}

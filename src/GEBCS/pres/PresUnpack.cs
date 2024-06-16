@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using GIL.FUNCTION;
 using Ionic.Zlib;
 using System.Text.Json;
+using GECV_EX_TR2_Editor_GUI;
 #pragma warning disable CS8604 // Possible null reference argument.
 
 namespace GEBCS
@@ -204,7 +205,13 @@ namespace GEBCS
                 if (Path.GetExtension(file.FileName) == ".tr2")
                 {
                     tr2Names.Names.Add(outFolder + file.FileName);
-                    new Tr2Decoder(outFolder + file.FileName);
+                    //new Tr2Decoder(outFolder + file.FileName);
+                    TextWriter backupOut = Console.Out;
+                    Console.SetOut(TextWriter.Null);
+                    GECV_EX_TR2_Editor tr2 = new GECV_EX_TR2_Editor(outFolder + file.FileName);
+                    tr2.ExportExcel();
+                    Console.SetOut(backupOut);
+
                 }
             }
             CreateXml();

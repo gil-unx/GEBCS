@@ -8,11 +8,110 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="GECV\CODEEATER\**" />
+    <Compile Remove="GECV\GECV EX TR2 Editor GUI\**" />
+    <Compile Remove="GECV\GECV II\**" />
+    <Compile Remove="GECV\GECV\**" />
+    <Compile Remove="GECV\GECV_Extend\**" />
+    <Compile Remove="GECV\GECV_EX_BLZ4\**" />
+    <Compile Remove="GECV\GECV_EX_GNF\**" />
+    <Compile Remove="GECV\GECV_EX_PRES\**" />
+    <Compile Remove="GECV\GECV_EX_TR2\**" />
+    <Compile Remove="GECV\GECV_FILE\**" />
+    <Compile Remove="GECV\GECV_PROXY\**" />
+    <Compile Remove="GECV\GECV_PROXY_BIN\**" />
+    <Compile Remove="GECV\GECV_PROXY_GE1\**" />
+    <Compile Remove="GECV\GECV_PROXY_GE2\**" />
+    <Compile Remove="GECV\GECV_PROXY_HELLO\**" />
+    <Compile Remove="GECV\GECV_PROXY_STR\**" />
+    <Compile Remove="GECV\GECV_PROXY_TITLE\**" />
+    <Compile Remove="GECV\GEPSVRIFFWORKER\**" />
+    <Compile Remove="GECV\GEQI\**" />
+    <Compile Remove="GECV\GERDPS\**" />
+    <Compile Remove="GECV\GERDP\**" />
+    <Compile Remove="GECV\GERDP_RE\**" />
+    <Compile Remove="GECV\gms-picker\**" />
+    <Compile Remove="GECV\GODVEIN\**" />
+    <Compile Remove="GECV\ProcessTester\**" />
+    <Compile Remove="GECV\RDPFUCKER\**" />
+    <Compile Remove="GECV\RDPSTRFUCKER\**" />
+    <Compile Remove="GECV\RETAEDOG-GUI\**" />
+    <Compile Remove="GECV\新建文件夹\**" />
+    <EmbeddedResource Remove="GECV\CODEEATER\**" />
+    <EmbeddedResource Remove="GECV\GECV EX TR2 Editor GUI\**" />
+    <EmbeddedResource Remove="GECV\GECV II\**" />
+    <EmbeddedResource Remove="GECV\GECV\**" />
+    <EmbeddedResource Remove="GECV\GECV_Extend\**" />
+    <EmbeddedResource Remove="GECV\GECV_EX_BLZ4\**" />
+    <EmbeddedResource Remove="GECV\GECV_EX_GNF\**" />
+    <EmbeddedResource Remove="GECV\GECV_EX_PRES\**" />
+    <EmbeddedResource Remove="GECV\GECV_EX_TR2\**" />
+    <EmbeddedResource Remove="GECV\GECV_FILE\**" />
+    <EmbeddedResource Remove="GECV\GECV_PROXY\**" />
+    <EmbeddedResource Remove="GECV\GECV_PROXY_BIN\**" />
+    <EmbeddedResource Remove="GECV\GECV_PROXY_GE1\**" />
+    <EmbeddedResource Remove="GECV\GECV_PROXY_GE2\**" />
+    <EmbeddedResource Remove="GECV\GECV_PROXY_HELLO\**" />
+    <EmbeddedResource Remove="GECV\GECV_PROXY_STR\**" />
+    <EmbeddedResource Remove="GECV\GECV_PROXY_TITLE\**" />
+    <EmbeddedResource Remove="GECV\GEPSVRIFFWORKER\**" />
+    <EmbeddedResource Remove="GECV\GEQI\**" />
+    <EmbeddedResource Remove="GECV\GERDPS\**" />
+    <EmbeddedResource Remove="GECV\GERDP\**" />
+    <EmbeddedResource Remove="GECV\GERDP_RE\**" />
+    <EmbeddedResource Remove="GECV\gms-picker\**" />
+    <EmbeddedResource Remove="GECV\GODVEIN\**" />
+    <EmbeddedResource Remove="GECV\ProcessTester\**" />
+    <EmbeddedResource Remove="GECV\RDPFUCKER\**" />
+    <EmbeddedResource Remove="GECV\RDPSTRFUCKER\**" />
+    <EmbeddedResource Remove="GECV\RETAEDOG-GUI\**" />
+    <EmbeddedResource Remove="GECV\新建文件夹\**" />
+    <None Remove="GECV\CODEEATER\**" />
+    <None Remove="GECV\GECV EX TR2 Editor GUI\**" />
+    <None Remove="GECV\GECV II\**" />
+    <None Remove="GECV\GECV\**" />
+    <None Remove="GECV\GECV_Extend\**" />
+    <None Remove="GECV\GECV_EX_BLZ4\**" />
+    <None Remove="GECV\GECV_EX_GNF\**" />
+    <None Remove="GECV\GECV_EX_PRES\**" />
+    <None Remove="GECV\GECV_EX_TR2\**" />
+    <None Remove="GECV\GECV_FILE\**" />
+    <None Remove="GECV\GECV_PROXY\**" />
+    <None Remove="GECV\GECV_PROXY_BIN\**" />
+    <None Remove="GECV\GECV_PROXY_GE1\**" />
+    <None Remove="GECV\GECV_PROXY_GE2\**" />
+    <None Remove="GECV\GECV_PROXY_HELLO\**" />
+    <None Remove="GECV\GECV_PROXY_STR\**" />
+    <None Remove="GECV\GECV_PROXY_TITLE\**" />
+    <None Remove="GECV\GEPSVRIFFWORKER\**" />
+    <None Remove="GECV\GEQI\**" />
+    <None Remove="GECV\GERDPS\**" />
+    <None Remove="GECV\GERDP\**" />
+    <None Remove="GECV\GERDP_RE\**" />
+    <None Remove="GECV\gms-picker\**" />
+    <None Remove="GECV\GODVEIN\**" />
+    <None Remove="GECV\ProcessTester\**" />
+    <None Remove="GECV\RDPFUCKER\**" />
+    <None Remove="GECV\RDPSTRFUCKER\**" />
+    <None Remove="GECV\RETAEDOG-GUI\**" />
+    <None Remove="GECV\新建文件夹\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="GECV\.gitattributes" />
+    <None Remove="GECV\.gitignore" />
+    <None Remove="GECV\LICENSE" />
+    <None Remove="GECV\Temp.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="GECV\g_GECV_EX\GECV_EX.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Ionic.Zlib.Core" Version="1.0.0" />
+    <PackageReference Include="MiniExcel" Version="1.32.1" />
   </ItemGroup>
 
 </Project>

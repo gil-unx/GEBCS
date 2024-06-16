@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "GERDP": {
+      "commandName": "Project",
+      "commandLineArgs": ".\\ .\\test psv",
+      "workingDirectory": "E:\\噬神者重生[PCSH00199][港版][中文][v1.10][DLC][Mai233]"
+    }
+  }
+}

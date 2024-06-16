@@ -1,4 +1,5 @@
-﻿using GIL.FUNCTION;
+﻿using GECV_EX_TR2_Editor_GUI;
+using GIL.FUNCTION;
 using Ionic.Zlib;
 using System.Text;
 using System.Text.Json;
@@ -39,7 +40,23 @@ namespace GEBCS
                 Console.WriteLine("Repack: "+outFolder + file.FileName);
                 if (file.Location == "Local")
                 {
-                    if (Path.GetExtension(file.FileName) == ".tr2") new Tr2Encoder(outFolder + file.FileName);
+                    if (Path.GetExtension(file.FileName) == ".tr2")
+                    {
+                        //new Tr2Encoder();
+                        TextWriter backupOut = Console.Out;
+                        Console.SetOut(TextWriter.Null);
+
+
+                        GECV_EX_TR2_Editor tr2 = new GECV_EX_TR2_Editor(outFolder + file.FileName);
+                        tr2.ImportExcel();
+
+
+                        Console.SetOut(backupOut);
+
+
+
+                    }
+  
             
                     byte[] buffer = File.ReadAllBytes(outFolder + file.FileName);
                     file.Offset = (int)newFiles.BaseStream.Position + pres.TocSize;

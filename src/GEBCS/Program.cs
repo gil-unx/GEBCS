@@ -1,4 +1,6 @@
 ﻿
+using GECV_EX.TR2;
+using GECV_EX_TR2_Editor_GUI;
 using GIL.FUNCTION;
 using System.Text.Json;
 
@@ -104,7 +106,24 @@ namespace GEBCS
         }
         static void Main(string[] args)
         {
-           // Unpack();
+            string s = ".\\f3594808fb6a0f2123811d0d26b0af74\\277_Step_PlusDLCMission1\\\\MS_011N_zonbi.res";
+            string a;
+            while (true)
+            {
+                
+                a = Path.GetDirectoryName(s)+".res";
+                if (!File.Exists(a))
+                {
+                    a = Path.ChangeExtension(s,"EDAT") ;
+                }
+                s =Path.GetDirectoryName(s);
+
+                if (s == ".")
+                {
+                    break;
+                }
+                Console.WriteLine(a);
+            }
             string mode = "";
             Console.WriteLine("God Eater Burst package unpacker");
             Console.WriteLine("================================");

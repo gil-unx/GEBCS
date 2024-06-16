@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "GECV_EX_TR2_Editor_GUI": {
+      "commandName": "Project",
+      "commandLineArgs": "unpack .\\caption.tr2.blz2 .\\caption_test.tr2 blz2",
+      "workingDirectory": "F:\\Documents\\VS2022\\GECV\\GECV_EX_BLZ4\\bin\\Debug\\net8.0\\",
+      "hotReloadEnabled": false
+    }
+  }
+}

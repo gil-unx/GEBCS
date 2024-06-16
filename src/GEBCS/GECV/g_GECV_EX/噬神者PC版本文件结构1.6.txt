@@ -1,0 +1,262 @@
+CODE EATER 汉化组
+https://www.haojun0823.xyz/
+email@haojun0823.xyz
+汉化群：461217810 
+https://github.com/HaoJun0823/GECV 参见GECV_II
+
+版本1.6，日期2024/05/05
+
+PRES PC结构：
+	Pres固定开头
+		magic_header：0x73657250 (PRES)
+		magic_1：1,2,3的意义未知，从解包时候数据来获取，似乎永远是固定的 （每个int32大小，一共3个）
+		magic_2
+		magic_3
+		pres_config_length：是所有PRES信息的文件长度，包括（）大小为Int32.
+		zerozero：Int64长度的0，也许pres_config_length的大小应该是Int64，总之因为游戏是32寻址所以几乎不重要。
+		country_count：国家数量，只有1和6两种区别，如果是1，这个文件没有国家语言内容，如果是6，这个文件按照（EN, FR, IT, DE, ES, RU）排列。
+	Pres固定开头结束（大小4+4+4+4+4+8+4=32）
+		
+	Pres国家(country)结构（条件：如果country_count不等于1的时候才存在，如果country_count等于1，从这里开始直接是dataset，也就是说country不存在）
+		dataset_offset:集合(dataset)信息的地址指针。
+		dataset_length:整个集合的大小。
+	Pres国家(country)结构结束（大小0或者(4+4)*6=48），如果country不存在，那么数量和指针都是0。
+		
+		=从这里开始为第每个国家的dataset=
+		Pres集合(dataset)结构：总是有8个，分别是res，prx,asset,unk,conf,tbl,text,rtbl
+			data_offset:第一个dataset的数据指针
+			data_count:data的数量
+		Pres集合(country)结构结束（大小(4+4)*8=64），如果dataset不存在，那么数量和指针都是0。
+		
+			Pres集合的数据区(data)
+				offset：Int32。偏移地址，转换为十六进制以后，第一个位为B或者F，后面七位是Pres文件内的指针（从文件开始算起） （算法：offset & ((1 [[ (32 - 4)) - 1)）
+				
+				*offset_type：不是游戏内的数据！如果为B，这个文件是虚拟引用的，目标指针为虚拟引用的文件名，在游戏运行时读取，如果是F，根据集合的情况来储存文件到指定区块。我们在这里假设offset后七位为*real_offset，第一位为*offset_type。
+				*real_offset：不是游戏内的数据！offset后七位的Int32。
+				
+				csize:Int32。data存在pres里的大小，如果文件为B，那么这里是0。（如果dataset=tbl，那么这个大小需要除以4（csize/4），解包时候需要乘以4(cise*4)）
+				conf_offset:Int32。data_conf（数据信息）的指针位置
+				conf_count：Int32。data_conf（数据信息）的数量。
+				unk1：Int32。1,2,3都是未知，只会被游戏载入。
+				unk2
+				unk3
+				usize：如果文件是blz4压缩，那么这个是解压后的大小，如果不是blz4，那么和csize一样。(这个地方是给BLZ2使用的)
+				
+				*file_data：不是游戏内的数据！如果*real_offset=F，从real_offset取csize大小的文件（如果dataset=tbl，那么csize需要*6，csize*6）
+				*B_file_name：不是游戏内的数据！如果*real_offset=B，从real_offset读取UTF8编码的字符串直到00结束。
+				
+			Pres集合的数据区(data)结束：每个data大小为4+4+4+4+4+4+4+4=32。
+			
+			Pres集合信息的数据（data_conf）：
+			
+				（如果是第六集合，第七集合，(dataset=tbl,dataset=text)，且data的offset为F（真实引用））：这里的文件不可被重复引用，每个国家的语言是单独的。
+					*file_data：是上文所提到的*file_data，需要用0对齐文件大小为16的整数倍，如果file_data能够是16的整数倍，需要补16个0。这里的地址是*real_offset的值，offset= 'F' + *real_offset。
+					
+				（文件信息数据块(data_conf)）：conf_offset的数据应该是这里的地址。：这里的文件不可被重复引用，每个国家的语言是单独的。
+				
+					（根据conf_count数量写入指针conf_offset_{index}）：
+						conf_offset_{index}：是data的起始指针。
+						
+					（根据conf_count数量写入数据conf_data_{index}）：
+						conf_data_{index}：是一段UTF8编码的字符串，末尾总是以十六进制的00结束。
+						
+				（文件信息数据块(data_conf)）：需要用0对齐文件大小为16的整数倍，如果file_data能够是16的整数倍，需要补16个0。
+				
+				（如果*offset_type='B'）：这里的文件不可被重复引用，每个国家的语言是单独的。
+					*B_file_name：是上文提到的*B_file_name，需要用0对齐文件大小为16的整数倍，如果file_data能够是16的整数倍，需要补16个0。这里的地址是*real_offset的值，offset= 'B' + *real_offset。
+				
+				
+				
+		=从这里为第每个国家的dataset的结束= pres_config_length = 这里的指针 这里应该是16的整数倍。
+	
+		
+		末尾文件区块：
+		*file_data：如果是F，且dataset不是tbl或者text，文件放在这里，每个文件可以被重复引用。需要用0对齐文件大小为16的整数倍，如果file_data能够是16的整数倍，需要补16个0。需要被引用的文件的*real_offset是这里的地址值，offset= 'F' + *real_offset。
+		末尾文件区块结束：
+		
+		整个文件应该是16的整数倍大小。
+		
+		
+BLZ4：
+	开头
+		magic:0x347a6c62 （BLZ4）
+		unpack_size：int32，解压后的大小。
+		zerozero：int64，8个0，实际上猜测unpack_size应该是int64，但是游戏不需要这么大的文件，因此无碍。
+		md5:16个byte，是解压后文件的md5。
+	结束
+	区块开始
+		chunk_size：如果开头是0，那么这个文件没有被压缩，从这里开始取到最后提取即可，如果不是0，从这里开始取chunk_size大小为chunk_data，如果最后是0或者没东西了，那么就代表结束了。在PRES里，所有文件都是16的整数倍，因此这个是必要的。
+		chunk_data：（UINT16）根据上文取到的数据长度为zlib压缩过的数据文件。
+	区块结束
+	
+	解包过程：
+		假设有8个区块，01234567，按照12345670的方式分别zlib解压然后提取。
+	打包过程：
+		根据一定大小切割原始文件（建议32768，如果是65535也就是UINT16的上线，也许会因为压缩的文件变得更大而溢出），假设切割出来8个区块，前七个大小32768，最后一个10000，那么按照01234567的方式压缩，最后写入12345670。
+
+BLZ2:
+	开头
+		magic:0x327a6c62 （BLZ2）
+	区块开始
+		chunk_size:最大为0xff，也就是65535，UINT16。
+		chunk_data:存储的文件数据区块，通过Zlib.Deflate进行压缩，这一点和BLZ4不一样。
+	区块结束
+
+	解包过程参见BLZ4，第一区块位置仍然是颠倒的。
+	若有文件大小小于等于0xff，那么这个文件不会被blz2压缩，因此，这种文件永远只有一个区块，且chunk_size等于文件大小。
+	zlib配置参照：（(9, zlib.DEFLATED, -15)） (Python)
+	
+		
+		
+bnsf,is14:
+	万代魔改的G722.1C
+	https://github.com/kode54/vgmstream/blob/master/src/meta/bnsf.c 可以解码游戏文件，详细结构在G722.1C的编码器中可以看到万代修改了什么
+	https://exvsfbce.home.blog/2020/02/04/guide-to-encoding-bnsf-is14-audio-files-converting-wav-back-to-bnsf-is14/ 所提到的G722.1，可以编码但无法被游戏正常读，用VS2010编译正常通过。
+	magic:INT32:是固定的BNSF
+	file_size:总文件大小-0x08
+	info：byte[8]，是8个字符，写着这个文件属于什么版本。
+	conf_1：忘记是声音的什么了，Int32。（有一个应该是比特率有一个应该是宽度）
+	conf_2：声道数量，如果是1是单声道，2是双声道。Int32。
+	conf_3:忘记是什么了。Int32。
+	conf_4：wav的样本大小（sample）Int32。
+	conf_5：不知道(INT32)
+	conf_6：不知道(INT32)
+	conf_7：不知道(INT32)
+	conf_8:后面所有数据的大小。（总文件大小-0x30）
+	
+	file_data：被编码的数据。
+	
+gnf：
+	没有特征明显的头数据。
+	count:里面的dds数量，int32。
+	file_size_{count}：每个都是int32，count是几就有几个，每个是dds文件大小。
+	dds_file：根据file_size_{count}依次获取。
+	
+qpck:
+	magic:0x37402858，固定INT32
+	count：int32，文件数量
+	
+	根据文件数量依次取得：
+		offset:INT64，qpck内的偏移。
+		hash：INT64，这个数据的hash。（这里的hash应该是游戏调用时候的依据），这个hash转换成16进制字符串。
+		size：INT32，文件大小
+		
+	根据以上offset，size依次取得数据即可，命名为{文件顺序}_{hash的16进制16长度的字符串}，打包qpck的时候，需要按照顺序打包回去，请不要修改hash。
+	注1：可以在offset的地方读int32大小来判断这是什么文件。
+	注2：qpck实际的文件结构是由文件内的某种file来决定的。（开头80 02 63 72 6C 73 66 69 6C 65 0A 52 6C 73 44 61 74 61），我们无法解开这个文件的结构。
+	
+	
+tr2:
+	header:int32，头，固定：0x3272742E
+	header_magic:int32，差不多也是固定的：这里一般是年份，例如00 00 DF 07是2015，也就是新版本(PC)，如果是00 00 DA 07，也就是老版本2010（SONY_A），老版本还可能有2000,1999。
+	table_name:byte[48]：固定是48byte，从头读到0结束。
+
+	table_column_inf_offset:表信息开始的地方，绝大多数是0x40
+	table_column_int_count:一共有多少个头信息
+
+	0x40（表开始的地方）假设这个对象是*row_inf
+		int32 id:这是表的id
+		int32 offset:从文件开始算起的offset是表的数据
+		int32 magic:表的魔术码
+		int32 csize:表的大小
+		int32 usize:是blz4里出现的内容，但是这里没有压缩，所以永远和csize一样大。
+
+		*row_data:定义一个对象，是表的数据，是从offset取csize大小的byte[]
+
+	0x40+ table_column_int_count*5*20（表开始的结束） //如果是老版本TR2没有这一部分，因此你需要通过每个分表来重建
+		
+		表配置：如果一个tr2没有这一部分，说明这个文件是没有被游戏调用的。 假设为*row_conf
+		int32 header_count;表id的数据数量
+		int32[headercount] header_id;这是一个数组，是表的列名称
+
+	以上内容从这里开始对齐16的整数倍，不足用00补齐，如果正好是16倍则不做任何变化。
+
+
+	*row_data:该文件需要从0x00开始算起始指针，不能从tr2文件内部算
+		row_name:byte[48]:固定是48byte，从头读到0结束。
+		row_serial:byte[16]:怀疑是对象类型序列化的特征。头8字节是数据格式？后8字节是Bin的版本。（前8老版本参考：6A 61 6A 70 00 00 00 00 = jajp） 后8字节参考（79 6F 62 69 38 yobi8）(老：00 CF 07 新：02 DF 07)
+		row_type:byte[48]:固定是48byte，从头读到0结束。 只可能是 INT8 UINT8 INT16 UINT16 INT32 UINT32 FLOAT32 这些数字和 ASCII UTF-8 UTF-16LE 还有一个也许存在的 UTF-16（大端编码？）
+
+		以上是固定长度的内容
+		然后从0x70开始：
+
+		0x70-0x73:不要动
+		0x74:未知
+		0x75:貌似是某种对齐的办法，如果是2最后要补齐为2的整数倍，如果是4最后要补齐为4的整数倍，这个不管。
+		0x76:一个byte，这里是指数据的数据数组大小。
+		0x77:未知
+		0x78-0x7B:不要动
+		row_data_count:0x7C-0x7F:数据的数量
+
+		根据0x7C-0x7F的数量，循环读取接下来的内容：
+			row_data[row_data_count].offset:int32,这些都是挨着的地址，如果哪一个超出了当前数据的最大长度，那么这个指针是无效的，要写成数据结束的位置，做记号。这些指针也许会重复同一个地址，猜测是在游戏编译的时候，因为数据不需要再次修改，因此合并了相同数据用于优化。
+		*老版本TR2存储：（old_tr2_offset_area）
+			row_data[row_data_count].id:int32,由于老版本tr2没有开头的id表（table_column_int_count)，所以这里存储4字节ID，ID有可能重复，但不会乱序。
+			row_data[row_data_count].offset:int32,这些都是挨着的地址，如果哪一个超出了当前数据的最大长度，那么这个指针是无效的，要写成数据结束的位置，做记号。这些指针也许会重复同一个地址，猜测是在游戏编译的时候，因为数据不需要再次修改，因此合并了相同数据用于优化。
+			row_data[row_data_count].length:int32,数据的长度，一些数据不通过0x76来判断大小，而是通过这个值除以数据类型长度，比如int16，这里是2，那么就意味着这里有1个int16，在建表的过程中，你需要标记有效和无效数据。
+
+		注意：多数组文本存储方式参加下文，和其他内容完全不一样！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+
+		lastmark:int32，结束的数据记号，是所有*row_data_data结束时候的指针。
+		lastmark_zero4:这里有4个0，用于分割接下来的数据。
+		从这里开始对齐16的整数倍，不足用00补齐，如果正好是16倍则不做任何变化。
+
+		*row_data_data:跳转到每个row_data[row_data_count].offset的位置，开始读取：
+			根据row_type来决定读取长度，如果是数字就是1,1,2,2,4,4,4(参见上方顺序)，如果是文字，asci和utf8读到0x00结束，utf-16le读到0x0000结束，注意，utf-16le有特殊文字编码，不可在一般的编辑器中修改，需要进一步处理。
+			根据0x76来决定读取数量。
+			假设0x76是9，row_type是"UINT8",row_data_count是3，那么就是有3个数据对象，每个对象的数组位长度是9，每次读1个byte的数据内容。
+			如果数据超过了指针也许剩下的数据就不存在，做记号。
+
+
+
+		展示表格的方式是：
+		列：
+		*row_inf.id
+		*row_inf.row_data.row_name
+		*row_inf.row_data.row_type
+		*row_inf.row_data.0x77作为index
+		*key(column):根据数据row_data_count来按顺序提取row_conf，也就是 row_conf[row_data_count].header_id
+		*value(row):row_inf[id].row_data[row_data_count].row_data_data[0x76]
+		
+		注：参见GECV TR2 GUI EDITOR展示的方法。
+			
+
+		2024/05/04一种新的发现：https://github.com/HaoJun0823/GECV/issues/17
+		如果0x76是多数组，且为文本格式：ASCII UTF8 UTF16 那么可能会出现以下这种情况，示例数据的0x76是0x14，UTF8，也就是十进制20：
+		FF FF 2C 00 42 00 6A 00 7D 00 8D 00 A9 00 BC 00 C9 00 D2 00 DB 00 E4 00 ED 00 F6 00 FF 00 08 01 11 01 1A 01 23 01 2C 01 35 01 
+		FF FF E5 A4 9A E7 81 BD E5 A4 9A E9 9B A3 E7 9A 84 E6 97 A5 E5 AD 90 00 E4 BA 9E E8 8E 89 E8 8E 8E EF BC 8C E5 9B A0 E9 81 8E 
+		E5 BA A6 E5 8B 9E E7 B4 AF E8 80 8C E5 80 92 E4 B8 8B E3 80 82 00 等等……
+		第一个 FF FF 双字节指针组
+		第二个 FF FF 文本组
+		将第一个 FF FF 的地址视为0x00，那么第一个指针2C 00刚好能跳转到 E5 A4，取UTF8格式也就是00结束，正确文本为：
+		E5 A4 9A E7 81 BD E5 A4 9A E9 9B A3 E7 9A 84 E6 97 A5 E5 AD 90 00
+		第二个42 00 跳转正确文本为：
+		E4 BA 9E E8 8E 89 E8 8E 8E EF BC 8C E5 9B A0 E9 81 8E E5 BA A6 E5 8B 9E E7 B4 AF E8 80 8C E5 80 92 E4 B8 8B E3 80 82 00
+
+		2024/05/05 老版本TR2多数组文本存储：
+		老版本把下一级数组的存储放在了old_tr2_offset_area这一层，假设0x76是十进制的4，而row_data_count是12，那么会有12/4=3组数据，ID从00到02。
+		那么存储情况如下
+		00 文本指针 文本长度 00 文本指针 文本长度 00 文本指针 文本长度
+		01 文本指针 文本长度 01 文本指针 文本长度 01 文本指针 文本长度
+		02 文本指针 文本长度 02 文本指针 文本长度 02 文本指针 文本长度
+		
+		文本区域
+
+		文本长度不包含utf8,ascii的00和utf16的00 00，但文本需要00。
+
+		如何判断是哪个版本的TR2？
+		我们把PC称之为VER.2，把SONY_A称之为VER.1
+		PC版本有header_count，如果读取header_count为0，或者header_count超过了头的大小，那么就是ver.1，反之是ver.2
+		如何判断头的总长度？
+		第一个片段的offset是头数据的结尾。
+		
+
+	*row_data：从这里开始对齐16的整数倍，不足用00补齐，如果正好是16倍则不做任何变化。
+
+
+
+
+
+		
+
+

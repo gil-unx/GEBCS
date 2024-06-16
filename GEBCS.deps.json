@@ -8,7 +8,8 @@
     ".NETCoreApp,Version=v8.0": {
       "GEBCS/1.0.0": {
         "dependencies": {
-          "Ionic.Zlib.Core": "1.0.0"
+          "Ionic.Zlib.Core": "1.0.0",
+          "MiniExcel": "1.32.1"
         },
         "runtime": {
           "GEBCS.dll": {}
@@ -19,6 +20,14 @@
           "lib/netstandard2.0/Ionic.Zlib.Core.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "MiniExcel/1.32.1": {
+        "runtime": {
+          "lib/net6.0/MiniExcel.dll": {
+            "assemblyVersion": "1.32.1.0",
+            "fileVersion": "1.32.1.0"
           }
         }
       }
@@ -36,6 +45,13 @@
       "sha512": "sha512-3GBgjMQA/uPTiqv+wMCpLsyK5dcHCF6EV8+pg4IMKLbgbMGEtIkvErEO4ql5Cv18n94Smf3NAhY/sCed2Tb+Tw==",
       "path": "ionic.zlib.core/1.0.0",
       "hashPath": "ionic.zlib.core.1.0.0.nupkg.sha512"
+    },
+    "MiniExcel/1.32.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-givinRByTg0nQAktcFSaLmIt9Ki+LwYjlwtSYXuwQdoyAy8Z3RfBnKR/UA/79mWmb8wKJgPlnZf87pvOBpdZ/g==",
+      "path": "miniexcel/1.32.1",
+      "hashPath": "miniexcel.1.32.1.nupkg.sha512"
     }
   }
 }

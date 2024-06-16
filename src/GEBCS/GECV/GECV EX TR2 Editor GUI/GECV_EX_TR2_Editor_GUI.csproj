@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>GECV_EX_TR2_Editor_GUI</RootNamespace>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyVersion>1.0.1.5</AssemblyVersion>
+    <FileVersion>1.0.1.5</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GECV II\GECV_EX\GECV_EX.csproj" />
+  </ItemGroup>
+
+</Project>

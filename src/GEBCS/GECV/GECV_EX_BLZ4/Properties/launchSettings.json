@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "GECV_EX_BLZ4": {
+      "commandName": "Project",
+      "commandLineArgs": "pack .\\",
+      "workingDirectory": "F:\\Documents\\VS2022\\GECV\\GECV_EX_BLZ4\\bin\\Debug\\net8.0"
+    }
+  }
+}
