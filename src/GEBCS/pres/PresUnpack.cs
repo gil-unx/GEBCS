@@ -131,7 +131,7 @@ namespace GEBCS
                             }
                             else
                             {
-                                file.Location = "Package";
+                                file.Location = "PackageFiles";
                                 file.ShiftOffset = 15;
                                 if (isDlc)
                                 {
@@ -148,7 +148,7 @@ namespace GEBCS
                 }               
             }                                                 
         }
-        public void Unpack(ref BR package,ref ResNames resNames,ref Tr2Names tr2Names)
+        public void Unpack(ref BR package,ref ResNames resNames,ref Tr2Names tr2Names,ref PackageFiles packageFiles)
         {
             for(int i = 0; i < pres.TotalFile; i++)
             {
@@ -165,7 +165,8 @@ namespace GEBCS
                         case "Local":
                             comBuffer = reader.GetBytes((long)offset, size);                           
                             break;
-                        case "Package":
+                        case "PackageFiles":
+                            packageFiles.Files.Add(new PackageContent() { Name = outFolder + file.FileName, Offset = file.Offset });
                             comBuffer = package.GetBytes((long)offset, file.Size);
                             int padding = 0x8000 - (file.Size % 0x8000);
                             if (padding == 0x8000) padding = 0;
@@ -200,17 +201,17 @@ namespace GEBCS
                 {
                     resNames.Names.Add(outFolder + file.FileName);                                                        
                     PresUnpack pres = new PresUnpack((outFolder + file.FileName));
-                    pres.Unpack(ref package, ref resNames , ref tr2Names);                  
+                    pres.Unpack(ref package, ref resNames , ref tr2Names, ref packageFiles);                  
                 }
                 if (Path.GetExtension(file.FileName) == ".tr2")
                 {
                     tr2Names.Names.Add(outFolder + file.FileName);
-                    //new Tr2Decoder(outFolder + file.FileName);
-                    TextWriter backupOut = Console.Out;
-                    Console.SetOut(TextWriter.Null);
-                    GECV_EX_TR2_Editor tr2 = new GECV_EX_TR2_Editor(outFolder + file.FileName);
-                    tr2.ExportExcel();
-                    Console.SetOut(backupOut);
+                   // //new Tr2Decoder(outFolder + file.FileName);
+                   // TextWriter backupOut = Console.Out;
+                   // Console.SetOut(TextWriter.Null);
+                   // GECV_EX_TR2_Editor tr2 = new GECV_EX_TR2_Editor(outFolder + file.FileName);
+                   // tr2.ExportExcel();
+                   // Console.SetOut(backupOut);
 
                 }
             }

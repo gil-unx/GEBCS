@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GEBCS": {
+      "commandName": "Project",
+      "commandLineArgs": "-c 9"
+    }
+  }
+}

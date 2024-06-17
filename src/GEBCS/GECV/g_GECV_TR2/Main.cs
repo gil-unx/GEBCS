@@ -30,7 +30,7 @@ namespace GECV_EX_TR2_Editor_GUI
         {
             AutoOpenTR2();
             TR2ExcelHelper.Save(System_DataTable, System_DataTable_Hex, excelName);
-            TR2Writer writer;
+            
 
         }
         public void ImportExcel()

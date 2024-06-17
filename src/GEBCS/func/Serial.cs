@@ -10,4 +10,13 @@ namespace GEBCS
     {
         public List<string> ?Names { get; set; }
     }
+    public class PackageContent
+    {
+        public string? Name { get; set; }
+        public int Offset { get; set; }    
+    }
+    public class PackageFiles
+    {
+        public List<PackageContent>? Files { get; set; }
+    }
 }

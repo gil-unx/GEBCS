@@ -13,7 +13,7 @@ namespace GEBCS
         private MemoryStream resStream;
         private bool isDlc = false;
         Dictionary<UInt64, int> ptSame = new Dictionary<UInt64, int>();
-        public PresRepack(string resName,bool dlc =false)
+        public PresRepack(string resName, bool dlc = false)
         {
             isDlc = dlc;
             pres = JsonSerializer.Deserialize<Pres>(File.ReadAllText(Path.ChangeExtension(resName, "json")));
@@ -26,38 +26,24 @@ namespace GEBCS
             writer.Write(pres.GrupOffset);
             writer.Write(pres.GrupCount);
             writer.Write(pres.CeckSum & 3);
-            foreach(int i in pres.Grups)
+            foreach (int i in pres.Grups)
             {
                 writer.Write(i);
             }
         }
-        public void Repack(ref BW package,ref long pointOffset)
+        public void RepackF(ref BW package, ref Dictionary<int, int> ptSeekSame, ref Dictionary<string, int> packageDict,CompressionLevel level = CompressionLevel.Default)
         {
             MemoryStream memory = new MemoryStream();
             BW newFiles = new BW(memory);
+            
             foreach (Record file in pres.Files)
             {
-                Console.WriteLine("Repack: "+outFolder + file.FileName);
+                Console.WriteLine("Repack: " + outFolder + file.FileName);
                 if (file.Location == "Local")
                 {
-                    if (Path.GetExtension(file.FileName) == ".tr2")
-                    {
-                        //new Tr2Encoder();
-                        TextWriter backupOut = Console.Out;
-                        Console.SetOut(TextWriter.Null);
+                   
 
 
-                        GECV_EX_TR2_Editor tr2 = new GECV_EX_TR2_Editor(outFolder + file.FileName);
-                        tr2.ImportExcel();
-
-
-                        Console.SetOut(backupOut);
-
-
-
-                    }
-  
-            
                     byte[] buffer = File.ReadAllBytes(outFolder + file.FileName);
                     file.Offset = (int)newFiles.BaseStream.Position + pres.TocSize;
                     if (file.ChunkName == 1)
@@ -86,97 +72,80 @@ namespace GEBCS
                     newFiles.Write(arrName.ToArray());
                     newFiles.WritePadding(16, 0);
                 }
-                else if (file.Location == "Package")
+                else if (file.Location == "PackageFiles")
                 {
                     byte[] buffer = File.ReadAllBytes(outFolder + file.FileName);
                     byte[] compBuffer;
                     if (isDlc)
                     {
-                        UInt64 cekSumU = CalcCecksumU(buffer);
+                        
                         if (file.Compression == true)
                         {
-                            CompressionLevel level = CompressionLevel.Default;
+         
                             compBuffer = Compress(buffer, level);
+                            file.Size = compBuffer.Length;
+                           
                         }
                         else
                         {
                             compBuffer = buffer;
-                        }
-                        file.Size = compBuffer.Length;
-                        if ((file.Size > file.MaxSize)&&(file.Compression == true))
-                        {
-                            Console.WriteLine("Max size reached!!\nFile :\n{0}\nmaxsize :{1, 0:X8}\nnew size :{2, 0:X8}\nTry Compress Maximum", outFolder + file.FileName, file.MaxSize, file.Size);
-                            CompressionLevel level = CompressionLevel.BestCompression;
-                            compBuffer = Compress(buffer, level);
                             file.Size = compBuffer.Length;
-                       
-                       
                         }
+
 
                         int newOffset;
 
-                       
-                        if (ptSame.TryGetValue(cekSumU, out newOffset))
+                        if (ptSeekSame.TryGetValue(packageDict[outFolder + file.FileName], out newOffset))
                         {
                         }
                         else
                         {
-                            newOffset = (int)pointOffset >> file.ShiftOffset;
-                            ptSame.Add(cekSumU, newOffset);
-                            file.Offset = newOffset;
+                            newOffset = (int)package.BaseStream.Position >> file.ShiftOffset;
+                            ptSeekSame.Add(packageDict[outFolder + file.FileName], newOffset);
                             package.Write(compBuffer);
                             package.WritePadding(0X10, 0);
-                            pointOffset = package.BaseStream.Position;
+                           
 
 
 
                         }
-
+                        file.Offset = newOffset;
 
 
                     }
                     else
                     {
+
                         if (file.Compression == true)
                         {
-                            CompressionLevel level = CompressionLevel.Default;
                             compBuffer = Compress(buffer, level);
+                            file.Size = compBuffer.Length;
+                           
                         }
                         else
                         {
                             compBuffer = buffer;
-                        }
-                        file.Size = compBuffer.Length;
-                        if (file.Size > file.MaxSize)
-                        {
-                            Console.WriteLine("Max size reached!!\nFile :\n{0}\nmaxsize :{1, 0:X8}\nnew size :{2, 0:X8}\nTry Compress Maximum", outFolder + file.FileName, file.MaxSize, file.Size);
-                            CompressionLevel level = CompressionLevel.BestCompression;
-                            compBuffer = Compress(buffer, level);
                             file.Size = compBuffer.Length;
 
-
                         }
-                        if (file.Size > file.MaxSize)
+
+                        int newOffset;
+
+
+                        if (ptSeekSame.TryGetValue(packageDict[outFolder + file.FileName], out newOffset))
                         {
-                            Console.WriteLine("Compression File larger than maximum size,\nExperimental Pointing mode?\nY\\N");
-                            string pil = Console.ReadLine().ToUpper();
-                            if (pil != "Y") Environment.Exit(0);
-
-                            package.BaseStream.Seek(pointOffset, SeekOrigin.Begin);
-                            file.Offset = (int)pointOffset >> file.ShiftOffset;
-                            package.Write(compBuffer);
-                            package.WritePadding(0X8000, 0);
-                            pointOffset = package.BaseStream.Position;
-
-
+                            
                         }
                         else
                         {
-                            package.BaseStream.Seek(file.Offset << file.ShiftOffset, SeekOrigin.Begin);
+                            newOffset = (int)package.BaseStream.Position >> file.ShiftOffset;
+                            ptSeekSame.Add(packageDict[outFolder + file.FileName], newOffset);
                             package.Write(compBuffer);
                             package.WritePadding(0X8000, 0);
-
+                           
                         }
+                        file.Offset = newOffset;
+
 
                     }
 
@@ -206,8 +175,8 @@ namespace GEBCS
         {
             using (MemoryStream memory = new MemoryStream())
             {
-                using (GZipStream gzip = new GZipStream(memory,CompressionMode.Compress,level))
-                {      
+                using (GZipStream gzip = new GZipStream(memory, CompressionMode.Compress, level))
+                {
                     gzip.Write(raw, 0, raw.Length);
                 }
                 return memory.ToArray();
@@ -215,7 +184,7 @@ namespace GEBCS
         }
         private UInt64 CalcCecksumU(byte[] destAarray)
         {
-          
+
             uint t = 0;
             uint cecksum = 0;
             foreach (byte b in destAarray)
@@ -231,11 +200,11 @@ namespace GEBCS
             uint t = 0;
             uint cecksum = 0;
             foreach (byte b in destAarray)
-            {          
+            {
                 cecksum = b ^ t;
                 t = b + cecksum;
             }
-            cecksum = (cecksum << 2)+ (pres.CeckSum & 3);
+            cecksum = (cecksum << 2) + (pres.CeckSum & 3);
             destAarray[15] = (byte)(cecksum / 16777216 & byte.MaxValue);
             destAarray[14] = (byte)(cecksum / 65536 & byte.MaxValue);
             destAarray[13] = (byte)(cecksum / 256 & byte.MaxValue);
